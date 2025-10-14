@@ -5,12 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>VibeXpert - Your College Social Hub</title>
   <link rel="stylesheet" href="vibemap.css" />
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 </head>
-<body>
-  <!-- Animated Background -->
+
+<body class="dark-mode">
   <div class="animated-bg" id="animatedBg"></div>
 
-  <!-- Authentication Page -->
   <div class="auth-container" id="authPage">
     <div class="auth-box">
       <h2 class="auth-title">VibeXpert</h2>
@@ -23,7 +25,6 @@
         <button class="auth-tab" data-tab="signup">Create Account</button>
       </div>
 
-      <!-- Login Form -->
       <div class="form-section active" id="login-section">
         <form id="loginForm">
           <div class="form-group">
@@ -36,38 +37,36 @@
           </div>
           <button type="submit" class="auth-button">Sign In to VibeXpert</button>
           <div class="forgot-password">
-            <a href="#">Forgot your password?</a>
+            <a href="#">Forgot password?</a>
           </div>
         </form>
       </div>
-      <!-- Forgot Password Section -->
-<div id="forgot-section" class="form-section">
-  <h2 class="auth-title">Forgot Password</h2>
-  <form id="forgotForm">
-    <div class="form-group">
-      <label class="form-label">Enter your Email</label>
-      <input type="email" id="forgotEmail" class="form-input" placeholder="example@email.com" required>
-    </div>
-    <button type="submit" class="auth-button">Send Reset Code</button>
-  </form>
 
-  <div id="resetCodeContainer" style="display:none; margin-top:20px;">
-    <div class="form-group">
-      <label class="form-label">Enter Reset Code</label>
-      <input type="text" id="resetCodeInput" class="form-input" placeholder="6-digit code" required>
-    </div>
-    <div class="form-group">
-      <label class="form-label">New Password</label>
-      <input type="password" id="newPassword" class="form-input" placeholder="New password" required>
-    </div>
-    <button id="resetPasswordBtn" class="auth-button">Reset Password</button>
-  </div>
+      <div id="forgot-section" class="form-section">
+        <h2 class="auth-title">Forgot Password</h2>
+        <form id="forgotForm">
+          <div class="form-group">
+            <label class="form-label">Enter your Email</label>
+            <input type="email" id="forgotEmail" class="form-input" placeholder="example@email.com" required>
+          </div>
+          <button type="submit" class="auth-button">Send Reset Code</button>
+        </form>
 
-  <p class="forgot-password"><a href="#" onclick="switchAuthTab('login')">Back to Login</a></p>
-</div>
+        <div id="resetCodeContainer" style="display:none; margin-top:20px;">
+          <div class="form-group">
+            <label class="form-label">Enter Reset Code</label>
+            <input type="text" id="resetCodeInput" class="form-input" placeholder="6-digit code" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">New Password</label>
+            <input type="password" id="newPassword" class="form-input" placeholder="New password" required>
+          </div>
+          <button id="resetPasswordBtn" class="auth-button">Reset Password</button>
+        </div>
 
+        <p class="forgot-password"><a href="#" onclick="switchAuthTab('login')">Back to Login</a></p>
+      </div>
 
-      <!-- Signup Form -->
       <div class="form-section" id="signup-section">
         <form id="signupForm" autocomplete="off">
           <div class="form-group">
@@ -83,7 +82,6 @@
             <input type="text" class="form-input" id="signupRegNumber" placeholder="Enter your college reg number" required />
           </div>
 
-          <!-- EXTRA FIELDS -->
           <div class="form-group">
             <label class="form-label">Gender</label>
             <div class="custom-options-container">
@@ -110,7 +108,6 @@
               <label class="custom-option"><input type="checkbox" name="interests" value="Gossips" /><span class="custom-checkbox"></span><span class="option-text">🗨️ Gossips</span></label>
               <label class="custom-option"><input type="checkbox" name="interests" value="Photos" /><span class="custom-checkbox"></span><span class="option-text">📸 Photos</span></label>
               <label class="custom-option"><input type="checkbox" name="interests" value="Food" /><span class="custom-checkbox"></span><span class="option-text">🍔 Food</span></label>
-              <label class="custom-option"><input type="checkbox" name="interests" value="love" /><span class="custom-checkbox"></span><span class="option-text">❤️Love</span></label>
             </div>
           </div>
 
@@ -133,111 +130,223 @@
     </div>
   </div>
 
-  <!-- Main Page -->
   <div class="main-page" id="mainPage" style="display:none;">
-    <!-- Header -->
     <header class="header">
-      <div class="logo">VibeXpert</div>
-      <nav class="nav-menu">
-        <a href="#" class="nav-item active" data-page="home">Home</a>
-        <a href="#" class="nav-item" data-page="communities">Communities</a>
-        <a href="#" class="nav-item" data-page="posts">Posts</a>
-        <a href="#" class="nav-item" data-page="subscriptions">Subscriptions</a>
-        <div class="search-container">
-          <input type="text" class="search-box" placeholder="Connect to more friends..." id="searchBox" />
-          <div class="search-results" id="searchResults"></div>
-        </div>
-      </nav>
-      <div class="user-greeting" id="userGreeting">
-        <span>Hi! Welcome Back</span>
-        <button class="logout-btn" id="logoutBtn">Logout</button>
-      </div>
-    </header>
+  <div class="logo">
+    VibeXpert
+    <div class="logo-subtitle">CONNECT WITH THE VERSE</div>
+  </div>
+   
+  <nav class="nav-menu">
+    <a href="#" class="nav-item active" data-page="home">Home</a>
+    <a href="#" class="nav-item" data-page="posts">Posts</a>
+    <a href="#" class="nav-item" data-page="communities">OurVIbes</a>
+    <a href="#" class="nav-item" data-page="communitie-plus">RealVibers</a>
+    <a href="#" class="nav-item" data-page="subscriptions">Subscriptions</a>
 
-    <!-- Main Content -->
+    <div class="search-container">
+      <input type="text" class="search-box" placeholder="Connect with more Vibers" id="searchBox" />
+      <button class="search-btn" id="searchBtn">🧐</button>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+  </nav>
+
+<div class="user-greeting" id="userGreeting"> <span>Hello , Welcome Back</span>
+    <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+  </div>
+</header>
+
+<div class="sidebar" id="sidebar">
+  <button class="close-sidebar" id="closeSidebar">&times;</button>
+  <ul>
+    <li id="profileBtn"><i class="fas fa-user"></i> Profile</li>
+    <li id="languageBtn"><i class="fas fa-language"></i> Language</li>
+    
+    <li id="darkModeToggle">
+        <i class="fas fa-moon"></i> Theams
+        <ul class="theme-options" style="display: none;">
+            <li id="setDarkModeBtn">🌙 Dark</li>
+            <li id="setLightModeBtn">☀️ Light</li>
+        </ul>
+    </li>
+
+    <li id="logoutBtn2"><i class="fas fa-sign-out-alt"></i> Logout</li>
+  </ul>
+</div>
+
+
     <main class="main-container" id="mainContent">
-      <!-- Home Content -->
       <div class="content-section active" id="home-content">
         <section class="welcome-section fade-in">
           <h1 class="welcome-title">Exploring VibeXpert?</h1>
           <p class="welcome-description">Your ultimate college community hub where stories meet, flavors connect, and friendships bloom!</p>
           <div class="daily-users">
-            <h3>Today's Active Vibers</h3>
             <div class="user-list">
-              <div class="user-card">Ritwik G. - Food Blogger</div>
-              <div class="user-card">Priya S. - Art Enthusiast</div>
-              <div class="user-card">Rohit M. - Tech Geek</div>
-              <div class="user-card">Sneha R. - Music Lover</div>
-              <div class="user-card">Dev P. - Sports Fan</div>
-              <div class="user-card">Amaira S. - Book Worm</div>
+              <div class="user-card">Know about new places around you</div>
+              <div class="user-card">Explore your college and share your experience</div>
+              <div class="user-card">connect with every college</div>
+              <div class="user-card">Make and Share the joy at the same time</div>
+              <div class="user-card">Need help??Subscribe and post in RealVibers </div>
+              <div class="user-card">All in one & One in all</div>
             </div>
           </div>
         </section>
 
-        <!-- College Section -->
         <section class="college-section fade-in">
-          <h2 class="page-title">VIT Bhopal University</h2>
+          <h2 class="page-title">500+ Active Universities</h2>
           <div class="college-photos">
-            <div class="college-photo"><img src="Screenshot 2025-09-13 003921.png" alt="Main Campus"><div class="photo-overlay">Main Campus</div></div>
-            <div class="college-photo"><img src="Screenshot 2025-09-13 004254.png" alt="Library"><div class="photo-overlay">Library</div></div>
-            <div class="college-photo"><img src="Screenshot 2025-09-13 004439.png" alt="Sports Complex"><div class="photo-overlay">Sports Complex</div></div>
-            <div class="college-photo"><img src="Screenshot 2025-09-13 004527.png" alt="Academic Blocks"><div class="photo-overlay">Academic Blocks</div></div>
-          </div>
-
-          <!-- Canteens -->
-          <div class="canteens-section fade-in">
-            <h3 class="page-title">Campus Canteens</h3>
-            <div class="canteens-grid">
-              <div class="canteen-card"><img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?auto=format&fit=crop&w=300&q=80"><div class="canteen-info"><h3>AB Dakshin</h3><p>South Indian delicacies</p></div></div>
-              <div class="canteen-card"><img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=300&q=80"><div class="canteen-info"><h3>Bistro</h3><p>Continental and fusion</p></div></div>
-              <div class="canteen-card"><img src="https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=300&q=80"><div class="canteen-info"><h3>Mayuri</h3><p>Traditional Indian flavors</p></div></div>
-              <div class="canteen-card"><img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=300&q=80"><div class="canteen-info"><h3>Underbelly</h3><p>Street food paradise</p></div></div>
-              <div class="canteen-card"><img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=300&q=80"><div class="canteen-info"><h3>Safal</h3><p>Healthy & nutritious meals</p></div></div>
+            <div class="college-photos-col">
+            <div class="college-photo"><img src="https://collegedost.in/wp-content/uploads/2024/12/nit-rourkela-1.png" alt="Main Campus"><div class="photo-overlay">31 NIT's</div></div>
+            <div class="college-photo"><img src="https://shikshamed.com/wp-content/uploads/2025/03/aiims.png" alt="Main Campus"><div class="photo-overlay">26 AIIMS</div></div>
             </div>
-          </div>
+            <div class="college-photos-col">
+            <div class="college-photo"><img src="https://iiits.ac.in/iiits-content/uploads/2020/04/abt1-1-1.jpg" alt="Main Campus"><div class="photo-overlay">26 IIIT's</div></div>
+            <div class="college-photo"><img src="https://content.jdmagicbox.com/quickquotes/listicle/listicle_1738572823717_i3t35_2000x945.jpg?impolicy=queryparam&im=Resize=(1200,900),aspect=fit&q=75&width=1200" alt="Main Campus"><div class="photo-overlay">23 IIT's</div></div>
+            <div class="college-photo"><img src="https://i0.wp.com/calmatters.org/wp-content/uploads/2023/09/083023-Madera-Community-Colleges-LV_06.jpg?w=2000&ssl=1" alt="Main Campus"><div class="photo-overlay">300+ Local Institutes</div></div>
+           </div>
+            <div class="college-photos-col">
+            <div class="college-photo"><img src="https://mpnvva.in/Image/UniversityPicture?instituteID=35" alt="Main Campus"><div class="photo-overlay">6 VIT's</div></div>
+            <div class="college-photo"><img src="https://upload.wikimedia.org/wikipedia/commons/c/cd/University-of-Alabama-EngineeringResearchCenter-01.jpg" alt="Main Campus"><div class="photo-overlay">28+ State Universities</div></div>
+                      </div>
+</div>
 
-          <!-- Posts -->
-          <div class="posts-section fade-in">
-            <h3 class="page-title">Latest Canteen Buzz</h3>
+        
+
+          <div class="posts-section fade-in" >
+            <h3 class="page-title">Updates On Latest Buzz's</h3>
             <div class="posts-container">
               <div class="post"><div class="post-header"><div class="post-author">@foodie_raj</div><div class="post-time">2h ago</div></div><p>"Mysore Masala Dosa at AB Dakshin is 🔥"</p></div>
               <div class="post"><div class="post-header"><div class="post-author">@hangry_student</div><div class="post-time">4h ago</div></div><p>"Bistro pasta night every Thursday 😋"</p></div>
-              <div class="post"><div class="post-header"><div class="post-author">@spice_lover</div><div class="post-time">6h ago</div></div><p>"Mayuri’s weekend thali feels like home"</p></div>
+              <div class="post"><div class="post-header"><div class="post-author">@spice_lover</div><div class="post-time">6h ago</div></div><p>"Mayuri's weekend thali feels like home"</p></div>
             </div>
           </div>
         </section>
       </div>
+      <div class="content-section" id="posts-content">
+        <h2 class="page-title">Posts</h2>
+        <p class="page-description">get read to upload and see the Vibes </p>
+<div class="snapchat-feature">
+  <div class="filter-container" id="filterContainer">
+    <div class="filter" id="filter1">🎨 Filter 1</div>
+    <div class="filter" id="filter2">🌸 Filter 2</div>
+    <div class="filter" id="filter3">🌈 Filter 3</div>
+  </div>
 
-      <!-- Other Pages -->
-      <div class="content-section" id="communities-content"><h2 class="page-title">Communities</h2><p class="page-description">Join communities based on your interests and connect with like-minded people.</p><div class="coming-soon"><h3>Coming Soon!</h3><p>We're working on amazing features.</p></div></div>
-      <div class="content-section" id="posts-content"><h2 class="page-title">Posts</h2><p class="page-description">Share your thoughts with your college community.</p><div class="coming-soon"><h3>Coming Soon!</h3></div></div>
-      <div class="content-section" id="subscriptions-content"><h2 class="page-title">Subscriptions</h2><p class="page-description">Manage your subscriptions easily.</p><div class="coming-soon"><h3>Coming Soon!</h3></div></div>
-    </main>
+  <button class="camera-btn" id="cameraBtn"><i class="fas fa-camera"></i></button>
+</div>
 
-    <!-- Footer -->
-    <footer class="footer">
+      </div>
+    <div class="content-section" id="communities-content">
+  <h2 class="page-title">OurVIbes</h2>
+  <p class="page-description">Discover and connect </p>
+  <div class="coming-soon">
+    <h3>Coming Soon!</h3>
+    <p>Exciting new features are on the way.</p>
+  </div>
+</div>
+      
+      <div class="content-section" id="communitie-plus-content">
+  <h2 class="page-title">RealVibers </h2>
+  <p class="page-description">Discover and connect with the most active members of VibeXpert.</p>
+  <div class="coming-soon">
+    <h3>Coming Soon!</h3>
+    <p>Exciting new features are on the way.</p>
+  </div>
+</div>
+
+<div class="content-section" id="subscriptions-content">
+    <h2 class="page-title">Subscriptions</h2>
+    <p class="page-description">Unlock the full potential of VibeXpert. Choose your vibe.</p>
+
+    <div class="plans-container">
+        <div class="plan-card">
+            <div class="plan-inner">
+                <div class="plan-header">
+                    <h3>Good Support</h3>
+                    <p>The Essentials</p>
+                </div>
+                <div class="plan-price">
+                    ₹0 <span class="price-duration">/ forever</span>
+                </div>
+                <ul class="plan-features">
+                    <li><span class="feature-icon feature-no">❌</span> Access to post in RealVibers</li>
+                    <li><span class="feature-icon feature-no">❌</span> Get Comments From Buyers</li>
+                    <li><span class="feature-icon feature-no">❌</span> Fastest Post Priority</li>
+                    <li><span class="feature-icon feature-no">❌</span> No Post Time Limit</li>
+                    <li><span class="feature-icon feature-no">❌</span> Post up to 3 times/day</li>
+                </ul>
+                <button class="plan-button">Continue with Good</button>
+            </div>
+        </div>
+
+        <div class="plan-card featured">
+            <div class="plan-badge">Most Popular</div>
+            <div class="plan-inner">
+                <div class="plan-header">
+                    <h3>Premium Support</h3>
+                    <p>Level Up Your Vibe</p>
+                </div>
+                <div class="plan-price">
+                  <p style="font-size:20px;"><s background="color:blue;"> 59 </s></p> ₹29 <span class="price-duration">/ month</span>
+                </div>
+                <ul class="plan-features">
+                    <li><span class="feature-icon feature-yes">✔</span> Access to post in RealVibers</li>
+                    <li><span class="feature-icon feature-yes">✔</span> Get Comments From Buyers</li>
+                    <li><span class="feature-icon feature-yes">✔</span> Fastest Post Priority</li>
+                    <li><span class="feature-icon feature-yes">✔</span> 5-Hour Post Time Limit</li>
+                    <li><span class="feature-icon feature-no">❌</span> Post up to 3 times/day</li>
+                </ul>
+                <button class="plan-button" onclick="window.location.href='https://yourwebsite.com/premium-plan-checkout'">
+                    Subscribe Premium
+                </button>
+            </div>
+        </div>
+
+        <div class="plan-card">
+            <div class="plan-inner">
+                <div class="plan-header">
+                    <h3>Premium Plus</h3>
+                    <p>The Ultimate Experience</p>
+                </div>
+                <div class="plan-price">
+                    ₹99 <span class="price-duration">/ month</span>
+                </div>
+                <ul class="plan-features">
+                    <li><span class="feature-icon feature-yes">✔</span> Access to post in RealVibers</li>
+                    <li><span class="feature-icon feature-yes">✔</span> Get Comments From Buyers</li>
+                    <li><span class="feature-icon feature-yes">✔</span> Fastest Post Priority</li>
+                    <li><span class="feature-icon feature-yes">✔</span> No Post Time Limit</li>
+                    <li><span class="feature-icon feature-yes">✔</span> Post up to 3 times/day</li>
+                </ul>
+                <button class="plan-button" onclick="window.location.href='https://yourwebsite.com/premium-plus-plan-checkout'">
+                    Subscribe Premium Plus
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+  
+
+
+<footer class="footer">
       <div class="footer-content">
         <h3>About Us</h3>
-        <p>VibeXpert connects VIT Bhopal students through shared experiences, food discoveries, and meaningful conversations.</p>
+        <p>VibeXpert connects students through shared experiences, food discoveries and meaningful conversations.</p>
         <p><strong>Created by:</strong>friends</p>
-        <p><strong>Email:</strong> <a href="mailto:smirfan9247@gmail.com">smirfan9247@gmail.com</a></p>
-        <p><strong>NAME:</strong>IRFAN.SM,RITWIK.G</p>
+        <p><strong>Email:</strong> <a href="mailto:vibexpert06@gmail.com">vibexpert06@gmail.com</a></p>
+        <p><strong>NAME:</strong>IRFAN.SM,RITVIK.G</p>
         <p>© 2025 VibeXpert</p>
+        
       </div>
     </footer>
-  </div>
-    ...
-  <script src="vibe1.js"></script>
-
-  <!-- 🎉 Signup Success Modal -->
-  <div id="signupPopup" class="popup-overlay">
+</main>
+      <!-- 🎉 Signup Success Modal -->
+<div id="signupPopup" class="popup-overlay">
     <div class="popup-box">
-      <h2 id="popupTitle">Congratulations!</h2>
-      <p id="popupMessage">Thank you for signing up to VibeXpert.</p>
-      <button id="closePopup">OK</button>
+      <h2 id="popupTitle">🎉Sign In Successful🎉</h2>
+      <p id="popupMessage">You Can Now Connect & Vibe.</p>
     </div>
   </div>
   <script src="vibemap.js"></script>
 </body>
 </html>
-
