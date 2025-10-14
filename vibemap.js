@@ -1,16 +1,66 @@
-/* ====== VibeXpert - Updated with Backend Integration ====== */
-
-// 🔧 BACKEND API URL - Change this when you deploy
-const API_URL = 'http://localhost:5000/api/auth';
-// For production, change to: const API_URL = 'https://your-backend-url.onrender.com/api/auth';
+/* ====== vibemap.js (merged and edited) ====== */
+// 🔄 Reset accounts & sessions once (so we start fresh)
+/*localStorage.removeItem('vibemapUsers');
+localStorage.removeItem('currentVibeMapUser');*/
 
 let currentUser = null;
+let registeredUsers = JSON.parse(localStorage.getItem('vibemapUsers')) || [];
+
+/* -------------------- Mouse particle + Tilt + Floating shapes -------------------- */
+document.addEventListener("mousemove", function(e) {
+  const particle = document.createElement("div");
+  particle.className = "mouse-particle";
+  particle.style.left = `${e.pageX}px`;
+  particle.style.top = `${e.pageY}px`;
+  document.body.appendChild(particle);
+  setTimeout(() => {
+    particle.remove();
+  }, 800);
+});
+
+// Tilt / 3D effect on containers
+document.querySelectorAll('.auth-box, .welcome-section').forEach((el) => {
+  el.classList.add('tilt-container');
+  el.addEventListener('mousemove', (e) => {
+    const { width, height, left, top } = el.getBoundingClientRect();
+    const x = e.clientX - left;
+    const y = e.clientY - top;
+    const rotateX = ((y / height) - 0.5) * 10;
+    const rotateY = ((x / width) - 0.5) * -10;
+    el.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  });
+  el.addEventListener('mouseleave', () => {
+    el.style.transform = `rotateX(0deg) rotateY(0deg)`;
+  });
+});
+
+// Floating shapes in background
+function createFloatingShapes() {
+  const container = document.querySelector('.auth-container');
+  if (!container) return;
+  const shapes = ['circle', 'square', 'triangle'];
+  for (let i = 0; i < 15; i++) {
+    const shape = document.createElement('div');
+    const type = shapes[Math.floor(Math.random() * shapes.length)];
+    shape.className = `floating-shape ${type}`;
+    shape.style.top = `${Math.random() * 100}%`;
+    shape.style.left = `${Math.random() * 100}%`;
+    const size = 5 + Math.random() * 10;
+    shape.style.width = `${size}px`;
+    shape.style.height = `${size}px`;
+    shape.style.animationDuration = `${8 + Math.random() * 8}s`;
+    container.appendChild(shape);
+  }
+}
+window.addEventListener('DOMContentLoaded', createFloatingShapes);
+
+/* -------------------- VibeXpert core -------------------- */
 
 document.addEventListener('DOMContentLoaded', function () {
   initAnimatedBackground();
   setupEventListeners();
+  applySavedTheme(); // <-- ADDED: Apply saved theme on load
 
-  // Show main page only if user logged in
   const savedUser = localStorage.getItem('currentVibeMapUser');
   if (savedUser) {
     currentUser = JSON.parse(savedUser);
@@ -36,7 +86,7 @@ function showMainPage() {
   if (main) main.style.display = 'block';
   if (currentUser) {
     const userGreet = document.querySelector('#userGreeting span');
-    if (userGreet) userGreet.textContent = `Hi! ${currentUser.name}`;
+    if (userGreet) userGreet.textContent = `Hi, ${currentUser.name}`;
   }
   switchPage('home');
 }
@@ -56,12 +106,18 @@ function handleLogout(e) {
 function setupEventListeners() {
   const loginForm = document.getElementById('loginForm');
   const signupForm = document.getElementById('signupForm');
-  const forgotForm = document.getElementById('forgotForm');
-  const logoutBtn = document.getElementById('logoutBtn');
+  
+  // ✅ EDITED: Changed ID to 'logoutBtn2' to match your HTML
+  const logoutBtn = document.getElementById('logoutBtn2'); 
+  
+  const cameraBtn = document.getElementById('cameraBtn');
+
+  if (cameraBtn) {
+    cameraBtn.addEventListener('click', openCameraOrGallery);
+  }
 
   if (loginForm) loginForm.addEventListener('submit', handleLogin);
   if (signupForm) signupForm.addEventListener('submit', handleSignup);
-  if (forgotForm) forgotForm.addEventListener('submit', handleForgotPassword);
   if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
 
   document.querySelectorAll('.auth-tab').forEach(tab => {
@@ -89,17 +145,63 @@ function setupEventListeners() {
     });
   }
 
-  // Forgot password link
-  const forgotLink = document.querySelector('.forgot-password a');
-  if (forgotLink) {
-    forgotLink.addEventListener('click', function(e) {
-      e.preventDefault();
-      switchAuthTab('forgot');
-    });
-  }
-
   setupSearchFunctionality();
+  setupThemeSwitcher(); // <-- ADDED: Setup for the new theme buttons
 }
+
+/* -------------------- ✅ NEW: Dark/Light Mode Theme Switcher -------------------- */
+function setupThemeSwitcher() {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const themeOptions = document.querySelector('.theme-options');
+    const setDarkModeBtn = document.getElementById('setDarkModeBtn');
+    const setLightModeBtn = document.getElementById('setLightModeBtn');
+    const body = document.body;
+
+    if (!darkModeToggle || !themeOptions || !setDarkModeBtn || !setLightModeBtn) return;
+
+    // Show/hide the theme options sub-menu
+    darkModeToggle.addEventListener('click', (e) => {
+        // Stop the click from closing the menu immediately
+        e.stopPropagation(); 
+        themeOptions.style.display = themeOptions.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Set theme to Dark
+    setDarkModeBtn.addEventListener('click', () => {
+        body.classList.remove('light-mode');
+        body.classList.add('dark-mode');
+        localStorage.setItem('vibeTheme', 'dark'); // Save preference
+        themeOptions.style.display = 'none';
+    });
+    
+    // Set theme to Light
+    setLightModeBtn.addEventListener('click', () => {
+        body.classList.remove('dark-mode');
+        body.classList.add('light-mode');
+        localStorage.setItem('vibeTheme', 'light'); // Save preference
+        themeOptions.style.display = 'none';
+    });
+
+    // Hide theme options if clicking anywhere else
+    document.addEventListener('click', () => {
+        if (themeOptions.style.display === 'block') {
+            themeOptions.style.display = 'none';
+        }
+    });
+}
+
+function applySavedTheme() {
+    const savedTheme = localStorage.getItem('vibeTheme') || 'dark'; // Default to dark
+    const body = document.body;
+    if (savedTheme === 'light') {
+        body.classList.remove('dark-mode');
+        body.classList.add('light-mode');
+    } else {
+        body.classList.remove('light-mode');
+        body.classList.add('dark-mode');
+    }
+}
+
 
 /* Switch auth tabs */
 function switchAuthTab(tabName) {
@@ -113,48 +215,34 @@ function switchAuthTab(tabName) {
   clearAlerts();
 }
 
-/* ==================== LOGIN (Backend Integration) ==================== */
-async function handleLogin(e) {
+/* Login */
+function handleLogin(e) {
   e.preventDefault();
   const username = document.getElementById('loginUsername').value.trim();
   const password = document.getElementById('loginPassword').value;
-  
   if (!username || !password) {
     showAlert('Please fill in all fields', 'error');
     return;
   }
 
-  showAlert('Logging in...', 'success');
+  const user = registeredUsers.find(u =>
+    (u.email && u.email.toLowerCase() === username.toLowerCase()) ||
+    (u.regNumber && u.regNumber.toLowerCase() === username.toLowerCase())
+  );
 
-  try {
-    const response = await fetch(`${API_URL}/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ username, password })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      currentUser = data.user;
-      localStorage.setItem('currentVibeMapUser', JSON.stringify(data.user));
-      showAlert('Login successful!', 'success');
-      setTimeout(showMainPage, 600);
-    } else {
-      showAlert(data.message || 'Invalid credentials', 'error');
-    }
-  } catch (error) {
-    console.error('Login error:', error);
-    showAlert('Server error. Please try again.', 'error');
+  if (user && user.password === password) {
+    currentUser = user;
+    localStorage.setItem('currentVibeMapUser', JSON.stringify(user));
+    showAlert('Login successful!', 'success');
+    setTimeout(showMainPage, 600);
+  } else {
+    showAlert('Invalid credentials', 'error');
   }
 }
 
-/* ==================== SIGNUP (Backend Integration) ==================== */
-async function handleSignup(e) {
+/* Signup */
+function handleSignup(e) {
   e.preventDefault();
-  
   const name = document.getElementById('signupName').value.trim();
   const email = document.getElementById('signupEmail').value.trim();
   const regNumber = document.getElementById('signupRegNumber').value.trim();
@@ -165,7 +253,6 @@ async function handleSignup(e) {
   const interests = Array.from(document.querySelectorAll('input[name="interests"]:checked')).map(i => i.value);
   const hobbies = document.getElementById('signupHobbies')?.value.trim() || '';
 
-  // Frontend validation
   if (!name || !email || !regNumber || !password || !confirmPassword || !gender || !userType) {
     showAlert('Please fill in all required fields', 'error');
     return;
@@ -182,87 +269,20 @@ async function handleSignup(e) {
     showAlert('Passwords do not match', 'error');
     return;
   }
-
-  showAlert('Creating your account...', 'success');
-
-  try {
-    const response = await fetch(`${API_URL}/signup`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        name,
-        email,
-        regNumber,
-        password,
-        gender,
-        userType,
-        interests,
-        hobbies
-      })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      showAlert('Account created! Check your email to verify.', 'success');
-      showSignupPopup(name);
-      
-      // Auto-login after successful signup
-      currentUser = data.user;
-      localStorage.setItem('currentVibeMapUser', JSON.stringify(data.user));
-      
-      setTimeout(showMainPage, 2000);
-    } else {
-      showAlert(data.message || 'Signup failed', 'error');
-    }
-  } catch (error) {
-    console.error('Signup error:', error);
-    showAlert('Server error. Please try again.', 'error');
+  if (registeredUsers.some(u => (u.email && u.email.toLowerCase() === email.toLowerCase()) || (u.regNumber && u.regNumber.toLowerCase() === regNumber.toLowerCase()))) {
+    showAlert('User already exists', 'error');
+    return;
   }
-}
 
-/* ==================== FORGOT PASSWORD (Backend Integration) ==================== */
-async function handleForgotPassword(e) {
-  e.preventDefault();
-  const email = document.getElementById('forgotEmail').value.trim();
+  const newUser = { name, email, regNumber, password, gender, userType, interests, hobbies, createdAt: new Date().toISOString() };
+  registeredUsers.push(newUser);
+  localStorage.setItem('vibemapUsers', JSON.stringify(registeredUsers));
+  currentUser = newUser;
+  localStorage.setItem('currentVibeMapUser', JSON.stringify(newUser));
+  showAlert('Account created successfully!', 'success');
   
-  if (!email) {
-    showAlert('Please enter your email', 'error');
-    return;
-  }
-
-  if (!validateEmail(email)) {
-    showAlert('Please enter a valid email address', 'error');
-    return;
-  }
-
-  showAlert('Sending reset email...', 'success');
-
-  try {
-    const response = await fetch(`${API_URL}/forgot-password`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      showAlert('Password reset email sent! Check your inbox.', 'success');
-      setTimeout(() => {
-        switchAuthTab('login');
-      }, 3000);
-    } else {
-      showAlert(data.message || 'Failed to send reset email', 'error');
-    }
-  } catch (error) {
-    console.error('Forgot password error:', error);
-    showAlert('Server error. Please try again.', 'error');
-  }
+  showSignupPopup(newUser.name);
+  setTimeout(showMainPage, 1500);
 }
 
 /* Navigation between main pages */
@@ -279,7 +299,6 @@ function showAlert(msg, type = 'success') {
   c.innerHTML = `<div class="alert ${type}">${msg}</div>`;
   setTimeout(() => { if (c) c.innerHTML = ''; }, 3000);
 }
-
 function clearAlerts() {
   const c = document.getElementById('alertContainer');
   if (c) c.innerHTML = '';
@@ -348,6 +367,7 @@ function setupSearchFunctionality() {
 function initAnimatedBackground() {
   const bg = document.getElementById('animatedBg');
   if (!bg) return;
+  bg.innerHTML = ''; // Clear previous elements to avoid duplication
 
   const dotColors = ['rgba(79,116,163,0.4)', 'rgba(141,164,211,0.35)', 'rgba(90,127,184,0.35)'];
   for (let i = 0; i < 30; i++) {
@@ -393,8 +413,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const toObserve = document.querySelectorAll('.fade-in, .college-photo, .canteen-card, .post');
   toObserve.forEach(el => {
-    el.style.opacity = el.style.opacity || '0';
-    el.style.transform = el.style.transform || 'translateY(20px)';
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
     observer.observe(el);
   });
 });
@@ -406,17 +426,212 @@ function showSignupPopup(username) {
   const msg = document.getElementById('popupMessage');
   if (!popup) return;
 
-  title.textContent = "🎉 Congratulations!";
-  msg.textContent = `Thank you ${username}, for signing up to VibeXpert. Check your email to verify your account!`;
-
+  title.textContent = "🎉Sign In Successful🎉";
+  msg.textContent = `Thank you ${username}, for signing up to VibeXpert. You Can Now Connect & Vibe.`;
   popup.style.display = 'flex';
+
+  const duration = 2000;
+  const end = Date.now() + duration;
+
+  (function frame() {
+    confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
+    confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
+    if (Date.now() < end) {
+      requestAnimationFrame(frame);
+    }
+  })();
+
+  setTimeout(() => {
+    popup.style.display = 'none';
+  }, 6000);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const closeBtn = document.getElementById('closePopup');
-  if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      document.getElementById('signupPopup').style.display = 'none';
-    });
+/* -------------------- Forgot Password -------------------- */
+function handleForgotPassword(e) {
+  e.preventDefault();
+  const email = document.getElementById("forgotEmail").value.trim();
+  if (!email) {
+    showAlert("Please enter your email", "error");
+    return;
   }
+  
+  // This is a demo. In a real app, you would fetch from a server.
+  const userExists = registeredUsers.some(u => u.email === email);
+  if (userExists) {
+      showAlert("Reset code sent to your email! (Demo Code: 123456)", "success");
+      window.sessionStorage.setItem("resetEmail", email);
+      window.sessionStorage.setItem("resetCode", "123456"); // Demo code
+      document.getElementById("resetCodeContainer").style.display = "block";
+  } else {
+      showAlert("Email not found in our records.", "error");
+  }
+}
+
+function handleResetPassword() {
+  const code = document.getElementById("resetCodeInput").value.trim();
+  const newPassword = document.getElementById("newPassword").value.trim();
+  const savedCode = window.sessionStorage.getItem("resetCode");
+  const email = window.sessionStorage.getItem("resetEmail");
+
+  if (code !== savedCode) {
+    showAlert("Invalid reset code", "error");
+    return;
+  }
+
+  const userIndex = registeredUsers.findIndex(u => u.email === email);
+  if (userIndex >= 0) {
+    registeredUsers[userIndex].password = newPassword;
+    localStorage.setItem("vibemapUsers", JSON.stringify(registeredUsers));
+    showAlert("Password reset successful! Please login.", "success");
+    switchAuthTab("login");
+  } else {
+    showAlert("User not found", "error");
+  }
+}
+/* -------------------- Camera & Post Upload -------------------- */
+function openCameraOrGallery() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.capture = 'environment';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const previewURL = URL.createObjectURL(file);
+    showPostPreview(previewURL, 'VIT Bhopal University'); // Default location
+  };
+  input.click();
+}
+
+function showPostPreview(imageURL, suggestedLocation) {
+  const modal = document.createElement('div');
+  modal.className = 'post-preview-modal';
+  modal.innerHTML = `
+    <div class="post-preview-content">
+      <img src="${imageURL}" style="max-width:100%; border-radius:10px;">
+      <input type="text" id="locationInput" placeholder="Enter location" value="${suggestedLocation}">
+      <div class="filters">
+        <button onclick="applyFilter('none')">Normal</button>
+        <button onclick="applyFilter('grayscale(100%)')">B/W</button>
+        <button onclick="applyFilter('sepia(80%)')">Sepia</button>
+        <button onclick="applyFilter('contrast(150%)')">Contrast+</button>
+      </div>
+      <button id="postBtn">Post</button>
+      <button id="cancelBtn">Cancel</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  document.getElementById('cancelBtn').addEventListener('click', () => modal.remove());
+  document.getElementById('postBtn').addEventListener('click', () => {
+    const loc = document.getElementById('locationInput').value;
+    alert('Photo posted with location: ' + loc);
+    modal.remove();
+  });
+}
+
+function applyFilter(filter) {
+  const img = document.querySelector('.post-preview-content img');
+  if (img) img.style.filter = filter;
+}
+
+/* Attach forgot/reset handlers */
+document.addEventListener("DOMContentLoaded", () => {
+  const forgotForm = document.getElementById("forgotForm");
+  if (forgotForm) forgotForm.addEventListener("submit", handleForgotPassword);
+
+  const resetBtn = document.getElementById("resetPasswordBtn");
+  if (resetBtn) resetBtn.addEventListener("click", handleResetPassword);
+});
+
+/* Post button logic (if you add a manual post section later) */
+document.addEventListener("DOMContentLoaded", () => {
+  const addPostBtn = document.getElementById("addPostBtn");
+  if (!addPostBtn) return; // Exit if the button isn't on the page
+
+  const postText = document.getElementById("postText");
+  const postImage = document.getElementById("postImage");
+  const userPosts = document.getElementById("userPosts");
+
+  addPostBtn.addEventListener("click", () => {
+    const text = postText.value.trim();
+    const file = postImage.files[0];
+    if (!text && !file) {
+      alert("Please enter text or select an image to post!");
+      return;
+    }
+
+    const post = document.createElement("div");
+    post.classList.add("post");
+    let contentHTML = `<p>${text}</p>`;
+    if (file) {
+      const imgURL = URL.createObjectURL(file);
+      contentHTML += `<img src="${imgURL}" alt="Post Image" style="width:100%;border-radius:10px;margin-top:10px;">`;
+    }
+    post.innerHTML = `
+      <div class="post-header">
+        <div class="post-author">@you</div>
+        <div class="post-time">just now</div>
+      </div>
+      ${contentHTML}
+    `;
+    userPosts.prepend(post);
+    postText.value = "";
+    postImage.value = "";
+  });
+});
+
+/* Sidebar menu toggle */
+document.addEventListener('DOMContentLoaded', () => {
+    const menuBtn = document.querySelector('.menu-btn');
+    const sidebar = document.querySelector('.sidebar');
+    const closeBtn = document.querySelector('.close-sidebar');
+
+    if (menuBtn && sidebar && closeBtn) {
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.add('active');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+        });
+    }
+});
+// Create a glowing circle that follows the mouse with a pop effect
+document.addEventListener('DOMContentLoaded', () => {
+  const authBg = document.getElementById('animatedBg'); // Your background container
+
+  if (!authBg) return;
+
+  // Create glow element
+  const glow = document.createElement('div');
+  glow.style.position = 'fixed';
+  glow.style.pointerEvents = 'none';
+  glow.style.width = '150px';
+  glow.style.height = '150px';
+  glow.style.borderRadius = '50%';
+  glow.style.background = 'radial-gradient(circle, rgba(79,116,163,0.5) 0%, transparent 70%)';
+  glow.style.mixBlendMode = 'screen';
+  glow.style.transition = 'transform 0.15s ease, opacity 0.3s ease';
+  glow.style.transform = 'translate(-50%, -50%) scale(1)';
+  glow.style.opacity = '0';
+  glow.style.zIndex = '9999';
+
+  document.body.appendChild(glow);
+
+  document.addEventListener('mousemove', e => {
+    glow.style.left = `${e.clientX}px`;
+    glow.style.top = `${e.clientY}px`;
+    glow.style.opacity = '5';
+    // Animate pop according to speed (optional)
+    glow.style.transform = 'translate(-50%, -50%) scale(1.2)';
+    clearTimeout(glow._timeout);
+    glow._timeout = setTimeout(() => {
+      glow.style.transform = 'translate(-50%, -50%) scale(1)';
+    }, 150);
+  });
+
+  document.addEventListener('mouseleave', () => {
+    glow.style.opacity = '4';
+  });
 });
