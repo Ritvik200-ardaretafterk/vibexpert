@@ -71,7 +71,7 @@ function setupEventListeners() {
   });
 
   document.querySelectorAll('.nav-item').forEach(link => {
-    link.addEventListener('click', function(e) {
+    link.addEventListener('click', function (e) {
       e.preventDefault();
       document.querySelectorAll('.nav-item').forEach(l => l.classList.remove('active'));
       this.classList.add('active');
@@ -92,7 +92,7 @@ function setupEventListeners() {
   // Forgot password link
   const forgotLink = document.querySelector('.forgot-password a');
   if (forgotLink) {
-    forgotLink.addEventListener('click', function(e) {
+    forgotLink.addEventListener('click', function (e) {
       e.preventDefault();
       switchAuthTab('forgot');
     });
@@ -118,7 +118,7 @@ async function handleLogin(e) {
   e.preventDefault();
   const username = document.getElementById('loginUsername').value.trim();
   const password = document.getElementById('loginPassword').value;
-  
+
   if (!username || !password) {
     showAlert('Please fill in all fields', 'error');
     return;
@@ -154,7 +154,7 @@ async function handleLogin(e) {
 /* ==================== SIGNUP (Backend Integration) ==================== */
 async function handleSignup(e) {
   e.preventDefault();
-  
+
   const name = document.getElementById('signupName').value.trim();
   const email = document.getElementById('signupEmail').value.trim();
   const regNumber = document.getElementById('signupRegNumber').value.trim();
@@ -208,11 +208,11 @@ async function handleSignup(e) {
     if (data.success) {
       showAlert('Account created! Check your email to verify.', 'success');
       showSignupPopup(name);
-      
+
       // Auto-login after successful signup
       currentUser = data.user;
       localStorage.setItem('currentVibeMapUser', JSON.stringify(data.user));
-      
+
       setTimeout(showMainPage, 2000);
     } else {
       showAlert(data.message || 'Signup failed', 'error');
@@ -227,7 +227,7 @@ async function handleSignup(e) {
 async function handleForgotPassword(e) {
   e.preventDefault();
   const email = document.getElementById('forgotEmail').value.trim();
-  
+
   if (!email) {
     showAlert('Please enter your email', 'error');
     return;
@@ -307,7 +307,7 @@ function setupSearchFunctionality() {
   const searchResults = document.getElementById('searchResults');
   if (!searchBox || !searchResults) return;
 
-  searchBox.addEventListener('input', function(e) {
+  searchBox.addEventListener('input', function (e) {
     const query = e.target.value.toLowerCase();
     searchResults.innerHTML = '';
     if (query.length > 1) {
@@ -337,7 +337,7 @@ function setupSearchFunctionality() {
     }
   });
 
-  document.addEventListener('click', function(event) {
+  document.addEventListener('click', function (event) {
     if (!searchBox.contains(event.target) && !searchResults.contains(event.target)) {
       searchResults.style.display = 'none';
     }
@@ -399,6 +399,188 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+/* -------------------- COMMUNITY CHAT -------------------- */
+let chatInterval = null;
+let currentPinMessageId = null;
+
+function setupChat() {
+  const sendBtn = document.getElementById('sendMessageBtn');
+  const chatInput = document.getElementById('chatInput');
+  const pinModal = document.getElementById('pinModal');
+  const closeModal = document.querySelector('.close-modal');
+  const confirmPinBtn = document.getElementById('confirmPinBtn');
+
+  if (sendBtn) {
+    sendBtn.addEventListener('click', sendMessage);
+  }
+
+  if (chatInput) {
+    chatInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') sendMessage();
+    });
+  }
+
+  if (closeModal) {
+    closeModal.addEventListener('click', () => {
+      pinModal.style.display = 'none';
+    });
+  }
+
+  window.addEventListener('click', (e) => {
+    if (e.target == pinModal) {
+      pinModal.style.display = 'none';
+    }
+  });
+
+  if (confirmPinBtn) {
+    confirmPinBtn.addEventListener('click', confirmPinMessage);
+  }
+
+  // Poll for messages when on communities page
+  setInterval(() => {
+    const isCommunitiesActive = document.getElementById('communities-content').classList.contains('active');
+    if (isCommunitiesActive) {
+      loadMessages();
+    }
+  }, 5000); // 5 sec polling
+}
+
+async function loadMessages() {
+  const container = document.getElementById('chatMessages');
+  if (!container) return;
+
+  try {
+    const response = await fetch(`${API_URL.replace('/auth', '')}/messages`);
+    const data = await response.json();
+
+    if (data.success) {
+      // Clear current messages? Or diff? For simplicity, we'll rebuild if changes detected or just rebuild.
+      // Optimization: storing last message ID or timestamp could be better, but for MVP rebuild is safer.
+      container.innerHTML = '';
+
+      if (data.messages.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:#888; margin-top:20px;">No active messages. Say hi! 👋</div>';
+        return;
+      }
+
+      data.messages.forEach(msg => {
+        const isOwn = currentUser && msg.user_id === currentUser.id;
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message-bubble ${isOwn ? 'own' : 'other'}`;
+
+        let pinHtml = '';
+        if (msg.is_pinned) {
+          pinHtml = `<div class="pinned-badge">📌 Pinned</div>`;
+        }
+
+        // Pin button (allow everyone to pin for now as per "if we pin any chart")
+        // In real app maybe only admin or owner. Here any user.
+        const pinBtnHtml = `<button class="pin-btn ${msg.is_pinned ? 'active' : ''}" onclick="openPinModal('${msg.id}')" title="Pin Message">📌</button>`;
+
+        const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        msgDiv.innerHTML = `
+          <div class="message-header">
+            <span class="message-author">${msg.user_name || 'User'}</span>
+            <span style="display:flex; align-items:center;">
+              ${pinHtml}
+              ${pinBtnHtml}
+              <span class="message-time">${time}</span>
+            </span>
+          </div>
+          <div class="message-content">${msg.content}</div>
+        `;
+        container.appendChild(msgDiv);
+      });
+
+      // Auto scroll to bottom only if near bottom or first load? 
+      // For now, let's just scroll to bottom relative simple. 
+      // container.scrollTop = container.scrollHeight; 
+    }
+  } catch (error) {
+    console.error('Error loading messages:', error);
+  }
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const content = input.value.trim();
+
+  if (!content) return;
+  if (!currentUser) {
+    showAlert('You must be logged in to chat!', 'error');
+    return;
+  }
+
+  // Optimistic UI? No, wait for server response for reliability first.
+  input.value = '';
+
+  try {
+    const response = await fetch(`${API_URL.replace('/auth', '')}/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content,
+        user_id: currentUser.id,
+        user_name: currentUser.name || currentUser.username || 'User' // Handle mismatch
+      })
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      loadMessages(); // Refresh immediately
+    } else {
+      showAlert('Failed to send message', 'error');
+    }
+  } catch (error) {
+    console.error('Send error:', error);
+    showAlert('Error sending message', 'error');
+  }
+}
+
+// Global scope for onclick
+window.openPinModal = function (msgId) {
+  currentPinMessageId = msgId;
+  const modal = document.getElementById('pinModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+async function confirmPinMessage() {
+  if (!currentPinMessageId) return;
+
+  const durationInput = document.querySelector('input[name="pinDuration"]:checked');
+  const duration = durationInput ? durationInput.value : 7;
+
+  try {
+    const response = await fetch(`${API_URL.replace('/auth', '')}/messages/${currentPinMessageId}/pin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        is_pinned: true,
+        durationDays: duration
+      })
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      showAlert('Message pinned!', 'success');
+      document.getElementById('pinModal').style.display = 'none';
+      loadMessages();
+    } else {
+      showAlert('Failed to pin message', 'error');
+    }
+  } catch (error) {
+    console.error('Pin error:', error);
+    showAlert('Error pinning message', 'error');
+  }
+}
+
+// Call setupChat when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  setupChat();
+});
+
+
 /* -------------------- Signup Popup -------------------- */
 function showSignupPopup(username) {
   const popup = document.getElementById('signupPopup');
@@ -419,4 +601,5 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('signupPopup').style.display = 'none';
     });
   }
+
 });
