@@ -209,7 +209,38 @@
       </div>
 
       <!-- Other Pages -->
-      <div class="content-section" id="communities-content"><h2 class="page-title">Communities</h2><p class="page-description">Join communities based on your interests and connect with like-minded people.</p><div class="coming-soon"><h3>Coming Soon!</h3><p>We're working on amazing features.</p></div></div>
+      <div class="content-section" id="communities-content">
+        <h2 class="page-title">Community Chat</h2>
+        <p class="page-description">Connect with everyone! Messages disappear after 5 days unless pinned.</p>
+        
+        <div class="chat-interface">
+          <div class="chat-messages" id="chatMessages">
+            <!-- Messages will be loaded here -->
+            <div class="loading-messages">Loading messages...</div>
+          </div>
+          
+          <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off">
+            <button id="sendMessageBtn">Send ➤</button>
+          </div>
+        </div>
+
+        <!-- Pin Duration Modal -->
+        <div id="pinModal" class="modal">
+          <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>📌 Pin Message</h3>
+            <p>How long should this message stay pinned?</p>
+            <div class="pin-options">
+              <label><input type="radio" name="pinDuration" value="1"> 24 Hours</label>
+              <label><input type="radio" name="pinDuration" value="7" checked> 1 Week</label>
+              <label><input type="radio" name="pinDuration" value="30"> 1 Month</label>
+              <label><input type="radio" name="pinDuration" value="3650"> Forever (10 Years)</label>
+            </div>
+            <button id="confirmPinBtn">Pin It!</button>
+          </div>
+        </div>
+      </div>
       <div class="content-section" id="posts-content"><h2 class="page-title">Posts</h2><p class="page-description">Share your thoughts with your college community.</p><div class="coming-soon"><h3>Coming Soon!</h3></div></div>
       <div class="content-section" id="subscriptions-content"><h2 class="page-title">Subscriptions</h2><p class="page-description">Manage your subscriptions easily.</p><div class="coming-soon"><h3>Coming Soon!</h3></div></div>
     </main>
@@ -240,4 +271,3 @@
   <script src="vibemap.js"></script>
 </body>
 </html>
-
