@@ -905,3 +905,242 @@ body {
 #closePopup:hover {
   background: #4f74a3;
 }
+
+/* --- COMMUNITY CHAT --- */
+.chat-interface {
+  background: rgba(15, 25, 45, 0.95);
+  border-radius: 20px;
+  border: 1px solid rgba(79, 116, 163, 0.3);
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  scrollbar-width: thin;
+  scrollbar-color: #4f74a3 rgba(15, 25, 45, 0.5);
+}
+
+.chat-messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: rgba(15, 25, 45, 0.5);
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background-color: #4f74a3;
+  border-radius: 4px;
+}
+
+.message-bubble {
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  font-size: 15px;
+  line-height: 1.5;
+  position: relative;
+  word-wrap: break-word;
+  animation: fadeIn 0.3s ease;
+}
+
+.message-bubble.own {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #4f74a3, #5a7fb8);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.message-bubble.other {
+  align-self: flex-start;
+  background: rgba(79, 116, 163, 0.15);
+  color: #e0e0e0;
+  border: 1px solid rgba(79, 116, 163, 0.2);
+  border-bottom-left-radius: 4px;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.message-author {
+  font-weight: 700;
+  color: #fff;
+}
+
+.message-bubble.other .message-author {
+  color: #8da4d3;
+}
+
+.message-time {
+  font-size: 11px;
+  margin-left: 10px;
+}
+
+.pinned-badge {
+  font-size: 11px;
+  background: rgba(255, 215, 0, 0.2);
+  color: #ffd700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  margin-right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pin-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 4px;
+  transition: color 0.2s;
+}
+
+.pin-btn:hover {
+  color: #ffd700;
+}
+
+.pin-btn.active {
+  color: #ffd700;
+}
+
+.chat-input-area {
+  padding: 20px;
+  background: rgba(10, 15, 30, 0.9);
+  border-top: 1px solid rgba(79, 116, 163, 0.2);
+  display: flex;
+  gap: 15px;
+}
+
+.chat-input-area input {
+  flex: 1;
+  padding: 15px 20px;
+  border-radius: 25px;
+  background: rgba(20, 30, 50, 0.8);
+  border: 1px solid rgba(79, 116, 163, 0.3);
+  color: white;
+  font-size: 16px;
+}
+
+.chat-input-area input:focus {
+  outline: none;
+  border-color: #4f74a3;
+  box-shadow: 0 0 15px rgba(79, 116, 163, 0.2);
+}
+
+.chat-input-area button {
+  padding: 0 25px;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #4f74a3, #8da4d3);
+  border: none;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.chat-input-area button:hover {
+  transform: scale(1.05);
+}
+
+/* Modal */
+.modal {
+  display: none; 
+  position: fixed; 
+  z-index: 1000; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; 
+  background-color: rgba(0,0,0,0.7); 
+  backdrop-filter: blur(5px);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: rgba(15, 25, 45, 0.95);
+  margin: auto;
+  padding: 30px;
+  border: 1px solid rgba(79, 116, 163, 0.4);
+  width: 90%;
+  max-width: 400px;
+  border-radius: 20px;
+  position: relative;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+  text-align: center;
+  color: #e0e0e0;
+}
+
+.close-modal {
+  color: #aaa;
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-modal:hover {
+  color: white;
+}
+
+.pin-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 25px 0;
+  text-align: left;
+}
+
+.pin-options label {
+  background: rgba(79, 116, 163, 0.1);
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pin-options label:hover {
+  background: rgba(79, 116, 163, 0.25);
+}
+
+#confirmPinBtn {
+  background: linear-gradient(135deg, #ffd700, #ffa500);
+  border: none;
+  padding: 12px 30px;
+  border-radius: 20px;
+  color: #0f192d;
+  font-weight: 800;
+  cursor: pointer;
+  width: 100%;
+  font-size: 16px;
+}
+
+#confirmPinBtn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+}
