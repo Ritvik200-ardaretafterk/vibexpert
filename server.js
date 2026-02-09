@@ -24,9 +24,9 @@ const supabaseAnon = createClient(
 
 // Health Check Endpoints
 app.get('/', (req, res) => {
-  res.json({ 
-    status: 'VibeXpert Server is running!', 
-    timestamp: new Date().toISOString() 
+  res.json({
+    status: 'VibeXpert Server is running!',
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -37,39 +37,39 @@ app.get('/health', (req, res) => {
 // ==================== SIGNUP ENDPOINT ====================
 app.post('/api/auth/signup', async (req, res) => {
   try {
-    const { 
-      name, 
-      email, 
-      regNumber, 
-      password, 
-      gender, 
-      userType, 
-      interests, 
-      hobbies 
+    const {
+      name,
+      email,
+      regNumber,
+      password,
+      gender,
+      userType,
+      interests,
+      hobbies
     } = req.body;
 
     // Validate required fields
     if (!name || !email || !regNumber || !password || !gender || !userType) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'All required fields must be filled' 
+        message: 'All required fields must be filled'
       });
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Invalid email format' 
+        message: 'Invalid email format'
       });
     }
 
     // Validate password length
     if (password.length < 6) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Password must be at least 6 characters' 
+        message: 'Password must be at least 6 characters'
       });
     }
 
@@ -90,9 +90,9 @@ app.post('/api/auth/signup', async (req, res) => {
 
     if (signUpError) {
       console.error('Supabase Auth Error:', signUpError);
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: signUpError.message || 'Signup failed' 
+        message: signUpError.message || 'Signup failed'
       });
     }
 
@@ -114,9 +114,9 @@ app.post('/api/auth/signup', async (req, res) => {
 
   } catch (error) {
     console.error('Signup Error:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       success: false,
-      message: 'Server error during signup' 
+      message: 'Server error during signup'
     });
   }
 });
@@ -127,9 +127,9 @@ app.post('/api/auth/login', async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Email and password are required' 
+        message: 'Email and password are required'
       });
     }
 
@@ -140,9 +140,9 @@ app.post('/api/auth/login', async (req, res) => {
     });
 
     if (authError) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        message: 'Invalid credentials' 
+        message: 'Invalid credentials'
       });
     }
 
@@ -167,9 +167,9 @@ app.post('/api/auth/login', async (req, res) => {
 
   } catch (error) {
     console.error('Login Error:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       success: false,
-      message: 'Server error during login' 
+      message: 'Server error during login'
     });
   }
 });
@@ -180,18 +180,18 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     const { email } = req.body;
 
     if (!email) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Email is required' 
+        message: 'Email is required'
       });
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Invalid email format' 
+        message: 'Invalid email format'
       });
     }
 
@@ -202,9 +202,9 @@ app.post('/api/auth/forgot-password', async (req, res) => {
 
     if (error) {
       console.error('Password Reset Error:', error);
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Failed to send reset email' 
+        message: 'Failed to send reset email'
       });
     }
 
@@ -215,9 +215,9 @@ app.post('/api/auth/forgot-password', async (req, res) => {
 
   } catch (error) {
     console.error('Forgot Password Error:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       success: false,
-      message: 'Server error' 
+      message: 'Server error'
     });
   }
 });
@@ -228,16 +228,16 @@ app.post('/api/auth/reset-password', async (req, res) => {
     const { token, newPassword } = req.body;
 
     if (!token || !newPassword) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Token and new password are required' 
+        message: 'Token and new password are required'
       });
     }
 
     if (newPassword.length < 6) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Password must be at least 6 characters' 
+        message: 'Password must be at least 6 characters'
       });
     }
 
@@ -248,9 +248,9 @@ app.post('/api/auth/reset-password', async (req, res) => {
 
     if (error) {
       console.error('Reset Password Error:', error);
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Failed to reset password' 
+        message: 'Failed to reset password'
       });
     }
 
@@ -261,10 +261,102 @@ app.post('/api/auth/reset-password', async (req, res) => {
 
   } catch (error) {
     console.error('Reset Password Error:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       success: false,
-      message: 'Server error' 
+      message: 'Server error'
     });
+  }
+});
+
+// ==================== COMMUNITY CHAT ENDPOINTS ====================
+
+// 1. Get Messages (active only)
+app.get('/api/messages', async (req, res) => {
+  try {
+    const { data: messages, error } = await supabase
+      .from('messages')
+      .select('*')
+      .order('created_at', { ascending: true }); // We want oldest first to render top-down, or newest first if bottom-up. Usually chat is oldest at top.
+
+    if (error) throw error;
+
+    const now = new Date();
+    const fiveDaysAgo = new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000);
+
+    // Filter messages:
+    // 1. Standard messages: created within last 5 days AND not pinned
+    // 2. Pinned messages: pinned_expires_at > now
+    const activeMessages = messages.filter(msg => {
+      if (msg.is_pinned) {
+        return msg.pinned_expires_at ? new Date(msg.pinned_expires_at) > now : true; // If no expiry set, treat as permanent (or handle otherwise)
+      } else {
+        return new Date(msg.created_at) > fiveDaysAgo;
+      }
+    });
+
+    res.json({ success: true, messages: activeMessages });
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch messages' });
+  }
+});
+
+// 2. Send Message
+app.post('/api/messages', async (req, res) => {
+  try {
+    const { content, user_id, user_name } = req.body;
+    if (!content || !user_id) {
+      return res.status(400).json({ success: false, message: 'Missing fields' });
+    }
+
+    const { data, error } = await supabase
+      .from('messages')
+      .insert([{ content, user_id, user_name, is_pinned: false }])
+      .select();
+
+    if (error) throw error;
+
+    res.json({ success: true, message: data[0] });
+  } catch (error) {
+    console.error('Error sending message:', error);
+    res.status(500).json({ success: false, message: 'Failed to send message' });
+  }
+});
+
+// 3. Pin Message
+app.post('/api/messages/:id/pin', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { is_pinned, durationDays } = req.body; // durationDays needed if pinning
+
+    let updateData = { is_pinned };
+
+    if (is_pinned) {
+      if (durationDays) {
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + parseInt(durationDays));
+        updateData.pinned_expires_at = expiresAt.toISOString();
+      } else {
+        // Default to maybe 365 days if not specified? Or require it. 
+        // Let's assume infinite if null, but user logic wants "user given time".
+        updateData.pinned_expires_at = null;
+      }
+    } else {
+      updateData.pinned_expires_at = null;
+    }
+
+    const { data, error } = await supabase
+      .from('messages')
+      .update(updateData)
+      .eq('id', id)
+      .select();
+
+    if (error) throw error;
+
+    res.json({ success: true, message: data[0] });
+  } catch (error) {
+    console.error('Error pinning message:', error);
+    res.status(500).json({ success: false, message: 'Failed to update pin status' });
   }
 });
 
@@ -274,9 +366,9 @@ app.post('/api/auth/logout', async (req, res) => {
     const { error } = await supabaseAnon.auth.signOut();
 
     if (error) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Logout failed' 
+        message: 'Logout failed'
       });
     }
 
@@ -287,9 +379,9 @@ app.post('/api/auth/logout', async (req, res) => {
 
   } catch (error) {
     console.error('Logout Error:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       success: false,
-      message: 'Server error' 
+      message: 'Server error'
     });
   }
 });
